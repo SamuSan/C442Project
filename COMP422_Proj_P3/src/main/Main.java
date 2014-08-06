@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import weka.classifiers.trees.j48.ModelSelection;
+import decisionTree.DecisionTree;
+
 public class Main {
 
 	private static String[] files = { "mfeat-fou", "mfeat-fac", "mfeat-kar",
@@ -20,50 +23,52 @@ public class Main {
 private static int numAtts =0;
 	public static void main(String[] args) {
 
-		createDataFile();
-		//createARFF();
+	//	createDataFile();
+	//	createARFF();
+		DecisionTree dt = new DecisionTree();
+
 
 	}
-
+//Creates a .arff format file from the created tabulated data file
 	private static void createARFF() {
 		System.out.println("");
 
 		for (String s : files) {
 			int attCount = attsNumMap.get(s);
 			for (int i = 1; i <= attCount; i++) {
-				String string = s+i+",";
-				attDeclarations.add(string);
+				String string = s+i;
+				attDeclarations.add("@ATTRIBUTE "+string + " NUMERIC\n");
 			}
 		}
-		attDeclarations.add("class");
+		attDeclarations.add("@ATTRIBUTE class {0,1,2,3,4,5,6,7,8,9}");
 		try {
-			File fileOutput = new File("imageFeatures.arff");
+			File fileOutput = new File("src/imageFeatures.arff");
 			FileWriter writer = new FileWriter(fileOutput);
-			String header="";
+			writer.write("@RELATION numerals\n\n");
 			for (String s : attDeclarations) {
-				header+=s;
+				writer.write(s);
 			}
-			header+="\n";
-			writer.write( header);
+	
+			writer.write( "\n\n@DATA \n");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					ClassLoader.getSystemResourceAsStream("featuresTabulated")));
 			String line = reader.readLine();
+			int linecount =1;
 			while (line != null){
 				writer.write(line+"\n");
-				
-				
 				line = reader.readLine();
+				linecount++;
 			}
-			
+			System.out.println("lines: " + linecount);
 			
 			writer.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		System.out.println(".arff Writing Done.");
 	}
-
+//Tabulates and combine data files to one file
 	private static void createDataFile() {
 		System.out.println("Creating dataset");
 		for (String s : files) {
