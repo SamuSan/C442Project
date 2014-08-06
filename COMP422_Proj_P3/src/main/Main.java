@@ -28,7 +28,7 @@ public class Main
 
         createDataFile();
          createARFF();
-       // DecisionTree dt = new DecisionTree();
+        DecisionTree dt = new DecisionTree();
 
     }
 
