@@ -28,8 +28,8 @@ public class Main
 
         createDataFile();
          createARFF();
-        DecisionTree dt = new DecisionTree();
-
+        DecisionTree dt = new DecisionTree("imageFeaturesTrain.arff","imageFeaturesTest.arff");
+dt.classify();
     }
 
     // Creates a .arff format file from the created tabulated data file

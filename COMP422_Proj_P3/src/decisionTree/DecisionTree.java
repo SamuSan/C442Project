@@ -13,28 +13,59 @@ import weka.core.Instances;
 
 public class DecisionTree
 {
-    private J48 tree = new J48();
+    private J48 tree; 
     private ArrayList<String> falseClassifications = new ArrayList<String>();
+    private Instances trainingData;
+    private Instances testData;
 
-    public DecisionTree()
+    public DecisionTree( String train, String test )
+    {
+        tree = new J48();
+        tree.setUnpruned( true );
+        createTrainingSet( train );
+        createTestSet( test );
+
+
+    }
+
+    private void createTestSet( String test )
     {
         try
         {
-            Instances trainingData = new Instances( new BufferedReader(
+            testData = new Instances( new BufferedReader(
                     new InputStreamReader( ClassLoader
-                            .getSystemResourceAsStream( "imageFeaturesTrain.arff" ) ) ) );
-            trainingData.setClassIndex( trainingData.numAttributes() - 1 );
-
-            Instances testData = new Instances( new BufferedReader(
-                    new InputStreamReader( ClassLoader
-                            .getSystemResourceAsStream( "imageFeaturesTest.arff" ) ) ) );
+                            .getSystemResourceAsStream( test ) ) ) );
             testData.setClassIndex( trainingData.numAttributes() - 1 );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
+    }
 
-            tree.setUnpruned( true );
+    private void createTrainingSet( String train )
+    {
+        try
+        {
+            trainingData = new Instances( new BufferedReader(
+                    new InputStreamReader( ClassLoader
+                            .getSystemResourceAsStream( train ) ) ) );
+            trainingData.setClassIndex( trainingData.numAttributes() - 1 );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void classify()
+    {
+        float correct = 0;
+        float incorrect = 0;
+        try
+        {
             tree.buildClassifier( trainingData );
             System.out.println( tree.toString() );
-            float correct = 0;
-            float incorrect = 0;
             for ( int i = 0; i < testData.numInstances(); i++ )
             {
                 double pred = tree.classifyInstance( testData.instance( i ) );
@@ -51,29 +82,19 @@ public class DecisionTree
                     incorrect++;
                 }
             }
-            Collections.sort(falseClassifications);
-            System.out.println( "Accuracy: " + correct / ( correct + incorrect ) );
-            System.out.println( "False classifications: " + incorrect / ( correct + incorrect ) );
-            Set<String> uniquest = new HashSet<String>(falseClassifications);
-            for ( String s : uniquest )
-            {
-                System.out.println(s +" : "+ Collections.frequency( falseClassifications, s ));
-            }
-        }
-        catch ( IOException e )
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         catch ( Exception e )
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        Collections.sort( falseClassifications );
+        System.out.println( "Accuracy: " + correct / ( correct + incorrect ) );
+        System.out.println( "False classifications: " + incorrect / ( correct + incorrect ) );
+        Set<String> uniquest = new HashSet<String>( falseClassifications );
+        for ( String s : uniquest )
+        {
+            System.out.println( s + " : " + Collections.frequency( falseClassifications, s ) );
+        }
     }
-
-    // public DecisionTree() {
-    // // TODO Auto-generated constructor stub
-    // }
 
 }
