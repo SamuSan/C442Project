@@ -15,11 +15,53 @@ public class Main {
 	private static String[] files = { "mfeat-fou", "mfeat-fac", "mfeat-kar",
 			"mfeat-pix", "mfeat-zer", "mfeat-mor" };
 	private static HashMap<Integer, ArrayList<ArrayList<String>>> table = createClassMap();
-
+	private static HashMap<String,Integer> attsNumMap = new HashMap<String,Integer>();
+	private static ArrayList<String> attDeclarations = new ArrayList<String>(); 
+private static int numAtts =0;
 	public static void main(String[] args) {
 
 		createDataFile();
+		//createARFF();
 
+	}
+
+	private static void createARFF() {
+		System.out.println("");
+
+		for (String s : files) {
+			int attCount = attsNumMap.get(s);
+			for (int i = 1; i <= attCount; i++) {
+				String string = s+i+",";
+				attDeclarations.add(string);
+			}
+		}
+		attDeclarations.add("class");
+		try {
+			File fileOutput = new File("imageFeatures.arff");
+			FileWriter writer = new FileWriter(fileOutput);
+			String header="";
+			for (String s : attDeclarations) {
+				header+=s;
+			}
+			header+="\n";
+			writer.write( header);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					ClassLoader.getSystemResourceAsStream("featuresTabulated")));
+			String line = reader.readLine();
+			while (line != null){
+				writer.write(line+"\n");
+				
+				
+				line = reader.readLine();
+			}
+			
+			
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	private static void createDataFile() {
@@ -37,6 +79,7 @@ public class Main {
 					for (int k = 0; k < 10; k++) {
 						ArrayList<ArrayList<String>> strings = new ArrayList<ArrayList<String>>();
 						for (int i = 0; i < 200; i++) {
+					
 							String[] split = line.split(" ");
 							ArrayList<String> features = new ArrayList<String>();
 							for (String str : split) {
@@ -44,7 +87,11 @@ public class Main {
 									features.add(str);
 								}
 							}
+							if(attsNumMap.get(s) == null){
+								attsNumMap.put(s, features.size());
+							}
 							if (features.size() > 0) {
+								
 								strings.add(features);
 							}
 							line = reader.readLine();
@@ -60,23 +107,25 @@ public class Main {
 		}
 //printTable();
 		try {
-			File fileOutput = new File("featuresTabulated");
+			File fileOutput = new File("src/featuresTabulated");
 			FileWriter writer = new FileWriter(fileOutput);
 			int linecount =0;
 			for (int k = 0; k < 10; k++) {
 				ArrayList<ArrayList<String>> s = table.get(k);
 				for (ArrayList<String> list : s) {
+					numAtts = list.size();
 					String out = "";
 					for (int i = 0; i < list.size(); i++) {
+						
 						if(i == list.size()-1){
 							out += list.get(i) + ","+ k;
 						}
 						else{
 						out+=list.get(i)+",";
 						}
-						if(i == 648){
-							System.out.println("Linecoutn: "+ linecount +  " String ;" + out);
-						}
+//						if(i == 648){
+//							System.out.println("Linecoutn: "+ linecount +  " String ;" + out);
+//						}
 					}
 
 					writer.write(out + "\n");
