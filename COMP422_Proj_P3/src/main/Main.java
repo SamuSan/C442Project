@@ -3,6 +3,7 @@ package main;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -11,30 +12,32 @@ import java.util.HashMap;
 
 public class Main {
 
-	private static String[] files = { "mfeat-fou" 
-	 , "mfeat-fac", "mfeat-kar",
-	 "mfeat-pix", "mfeat-zer", "mfeat-mor" };
+	private static String[] files = { "mfeat-fou", "mfeat-fac", "mfeat-kar",
+			"mfeat-pix", "mfeat-zer", "mfeat-mor" };
 	private static HashMap<Integer, ArrayList<ArrayList<String>>> table = createClassMap();
 
 	public static void main(String[] args) {
 
+		createDataFile();
+
+	}
+
+	private static void createDataFile() {
+		System.out.println("Creating dataset");
 		for (String s : files) {
 
-			System.out.println("Printing file : " + s);
+			System.out.println("Processing file : " + s);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					ClassLoader.getSystemResourceAsStream("mfeat-digits/" + s)));
 			try {
+				int count = 0;
 				String line = reader.readLine();
 				while (line != null) {
-					int count = 0;
-					for (int k = 0; k < 10; k++) {
-						// System.out.println("K" + k);
 
+					for (int k = 0; k < 10; k++) {
 						ArrayList<ArrayList<String>> strings = new ArrayList<ArrayList<String>>();
 						for (int i = 0; i < 200; i++) {
-							// System.out.println("i" + i);
 							String[] split = line.split(" ");
-
 							ArrayList<String> features = new ArrayList<String>();
 							for (String str : split) {
 								if (isNumeric(str)) {
@@ -44,24 +47,48 @@ public class Main {
 							if (features.size() > 0) {
 								strings.add(features);
 							}
-
 							line = reader.readLine();
 							count++;
 						}
 						addToTable(strings, k);
-
 					}
-					System.out.println(count);
 				}
-
+				System.out.println("Total lines processed : " + count);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		 printTable();
-		System.out.println("Done");
+//printTable();
+		try {
+			File fileOutput = new File("featuresTabulated");
+			FileWriter writer = new FileWriter(fileOutput);
+			int linecount =0;
+			for (int k = 0; k < 10; k++) {
+				ArrayList<ArrayList<String>> s = table.get(k);
+				for (ArrayList<String> list : s) {
+					String out = "";
+					for (int i = 0; i < list.size(); i++) {
+						if(i == list.size()-1){
+							out += list.get(i) + ","+ k;
+						}
+						else{
+						out+=list.get(i)+",";
+						}
+						if(i == 648){
+							System.out.println("Linecoutn: "+ linecount +  " String ;" + out);
+						}
+					}
 
+					writer.write(out + "\n");
+					linecount++;
+				}
+			}
+			writer.close();
+			System.out.println("Total lines processed : " + linecount);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("File Collation Done");
 	}
 
 	private static HashMap<Integer, ArrayList<ArrayList<String>>> createClassMap() {
@@ -84,21 +111,14 @@ public class Main {
 	}
 
 	public static void addToTable(ArrayList<ArrayList<String>> values, int k) {
-		// if(table.get(k).get(0).size() == 0){
-		System.out.println("Initial size" + table.get(k).size());
 		for (int i = 0; i < values.size(); i++) {
-			System.out.println(table.get(k).get(i).size());
 			table.get(k).get(i).addAll(values.get(i));
-			System.out.println(table.get(k).get(i).size());
 		}
-		System.out.println("Post add "  +table.get(k).size());
-		// }
-
 	}
 
 	public static void printTable() {
 		for (ArrayList<ArrayList<String>> s : table.values()) {
-			System.out.println("Instances list" + s.size());
+			//System.out.println("Instances list" + s.size());
 			for (ArrayList<String> list : s) {
 				System.out.println("Features list" + list.size());
 			}
