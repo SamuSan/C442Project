@@ -13,245 +13,323 @@ import java.util.HashMap;
 import weka.classifiers.trees.j48.ModelSelection;
 import decisionTree.DecisionTree;
 
-public class Main {
+public class Main
+{
 
-	private static String[] files = { "mfeat-fou", "mfeat-fac", "mfeat-kar",
-			"mfeat-pix", "mfeat-zer", "mfeat-mor" };
-	private static HashMap<Integer, ArrayList<ArrayList<String>>> table = createClassMap();
-	private static HashMap<String, Integer> attsNumMap = new HashMap<String, Integer>();
-	private static ArrayList<String> attDeclarations = new ArrayList<String>();
-	private static int numAtts = 0;
+    private static String[] files = { "mfeat-fou", "mfeat-fac", "mfeat-kar",
+            "mfeat-pix", "mfeat-zer", "mfeat-mor" };
+    private static HashMap<Integer, ArrayList<ArrayList<String>>> table = createClassMap();
+    private static HashMap<String, Integer> attsNumMap = new HashMap<String, Integer>();
+    private static ArrayList<String> attDeclarations = new ArrayList<String>();
+    private static int numAtts = 0;
 
-	public static void main(String[] args) {
+    public static void main( String[] args )
+    {
 
-		// createDataFile();
-		// createARFF(files);
-		// DecisionTree dt = new
-		// DecisionTree("imageFeaturesTrain.arff","imageFeaturesTest.arff");
-		// dt.classify();
-		createMorphARFF("mfeat-digits/mfeat-mor");
+         createDataFile();
+         createARFF(files);
+         DecisionTree dt = new
+         DecisionTree("imageFeaturesTrain.arff","imageFeaturesTest.arff");
+         dt.classify();
+        createMorphARFF( "mfeat-digits/mfeat-mor" );
 
-		DecisionTree dtMorph = new DecisionTree("imageFeaturesTrain.arff",
-				"imageFeaturesTest.arff");
-		dtMorph.classify();
+        DecisionTree dtMorph = new DecisionTree( "imageFeaturesMorphTrain.arff",
+                "imageFeaturesMorphTest.arff" );
+        dtMorph.classify();
 
-	}
+    }
 
-	private static void createMorphARFF(String file) {
+    private static void createMorphARFF( String file )
+    {
 
-		try {
-			File fileMorphTrain = new File("src/imageFeaturesMorphTrain.arff");
-			File fileMorphTest = new File("src/imageFeaturesMorphTrain.arff");
-			FileWriter writerTrain = new FileWriter(fileMorphTrain);
-			FileWriter writerTest = new FileWriter(fileMorphTest);
+        try
+        {
+            File fileMorphTrain = new File( "src/imageFeaturesMorphTrain.arff" );
+            File fileMorphTest = new File( "src/imageFeaturesMorphTest.arff" );
+            FileWriter writerTrain = new FileWriter( fileMorphTrain );
+            FileWriter writerTest = new FileWriter( fileMorphTest );
 
-			writerTrain.write("@RELATION Morph_Only\n\n");
-			for (int i = 0; i < 6; i++) {
-				writerTrain.write("@ATTRIBUTE " + files[5] + (i + 1) + " NUMERIC\n");
-			}
-			writerTrain.write("\n");
-			writerTrain.write("@DATA\n");
-			ArrayList<String> lines = new ArrayList<String>();
+            writerTrain.write( "@RELATION Morph_Only\n\n" );
+            writerTest.write( "@RELATION Morph_Only\n\n" );
+            for ( int i = 0; i < 6; i++ )
+            {
+                writerTrain.write( "@ATTRIBUTE " + files[5] + ( i + 1 ) + " NUMERIC\n" );
+                writerTest.write( "@ATTRIBUTE " + files[5] + ( i + 1 ) + " NUMERIC\n" );
+            }
+            
+            writerTrain.write( "@ATTRIBUTE class {0,1,2,3,4,5,6,7,8,9}");
+            writerTest.write( "@ATTRIBUTE class {0,1,2,3,4,5,6,7,8,9}" );
+            
+            writerTrain.write( "\n\n" );
+            writerTrain.write( "@DATA\n" );
+            writerTest.write( "\n" );
+            writerTest.write( "@DATA\n" );
+            ArrayList<String> lines = new ArrayList<String>();
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					ClassLoader.getSystemResourceAsStream(file)));
-			String line = reader.readLine();
+            BufferedReader reader = new BufferedReader( new InputStreamReader(
+                    ClassLoader.getSystemResourceAsStream( file ) ) );
+            String line = reader.readLine();
 
-			int lineCount = 1;
-			int inst = 0;
-			while (line != null) {
+            int lineCount = 1;
+            int inst = 0;
+            while ( line != null )
+            {
 
-				String[] split = line.split(" ");
-				ArrayList<String> features = new ArrayList<String>();
-				for (String str : split) {
-					if (isNumeric(str)) {
-						features.add(str);
-					}
-				}
-				String out = "";
-				for (int i = 0; i < features.size(); i++) {
-					if (i == features.size() - 1) {
-						out += features.get(i) + "," + inst;
-					} else {
-						out += features.get(i) + ",";
-					}
+                String[] split = line.split( " " );
+                ArrayList<String> features = new ArrayList<String>();
+                for ( String str : split )
+                {
+                    if ( isNumeric( str ) )
+                    {
+                        features.add( str );
+                    }
+                }
+                String out = "";
+                for ( int i = 0; i < features.size(); i++ )
+                {
+                    if ( i == features.size() - 1 )
+                    {
+                        out += features.get( i ) + "," + inst;
+                    }
+                    else
+                    {
+                        out += features.get( i ) + ",";
+                    }
 
-				}
-				writerTrain.write(out + "\n");
-				line = reader.readLine();
-				if (lineCount == 200) {
-					lineCount = 0;
-					inst++;
-				} else {
-					lineCount++;
-				}
-			}
-			writerTrain.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Morph Done");
+                }
+                if ( lineCount < 100 )
+                {
+                    writerTrain.write( out + "\n" );
+                }
+                else
+                {
+                    writerTest.write( out + "\n" );   
+                }
 
-	}
+                line = reader.readLine();
+                if ( lineCount == 200 )
+                {
+                    lineCount = 0;
+                    inst++;
+                }
+                else
+                {
+                    lineCount++;
+                }
+            }
+            writerTrain.close();
+            writerTest.close();
+        }
+        catch ( IOException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println( "Morph Done" );
 
-	// Creates a .arff format file from the created tabulated data file
-	private static void createARFF(String[] files) {
-		for (String s : files) {
-			int attCount = attsNumMap.get(s);
-			for (int i = 1; i <= attCount; i++) {
-				String string = s + i;
-				attDeclarations.add("@ATTRIBUTE " + string + " NUMERIC\n");
-			}
-		}
-		attDeclarations.add("@ATTRIBUTE class {0,1,2,3,4,5,6,7,8,9}");
-		try {
-			File fileTrain = new File("src/imageFeaturesTrain.arff");
-			File fileTest = new File("src/imageFeaturesTest.arff");
-			FileWriter writerTrain = new FileWriter(fileTrain);
-			FileWriter writerTest = new FileWriter(fileTest);
-			writerTrain.write("@RELATION numerals\n\n");
-			writerTest.write("@RELATION numerals\n\n");
-			for (String s : attDeclarations) {
-				writerTrain.write(s);
-				writerTest.write(s);
-			}
+    }
 
-			writerTrain.write("\n\n@DATA \n");
-			writerTest.write("\n\n@DATA \n");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					ClassLoader.getSystemResourceAsStream("featuresTabulated")));
-			String line = reader.readLine();
-			int lineCount = 1;
-			while (line != null) {
+    // Creates a .arff format file from the created tabulated data file
+    private static void createARFF( String[] files )
+    {
+        for ( String s : files )
+        {
+            int attCount = attsNumMap.get( s );
+            for ( int i = 1; i <= attCount; i++ )
+            {
+                String string = s + i;
+                attDeclarations.add( "@ATTRIBUTE " + string + " NUMERIC\n" );
+            }
+        }
+        attDeclarations.add( "@ATTRIBUTE class {0,1,2,3,4,5,6,7,8,9}" );
+        try
+        {
+            File fileTrain = new File( "src/imageFeaturesTrain.arff" );
+            File fileTest = new File( "src/imageFeaturesTest.arff" );
+            FileWriter writerTrain = new FileWriter( fileTrain );
+            FileWriter writerTest = new FileWriter( fileTest );
+            writerTrain.write( "@RELATION numerals\n\n" );
+            writerTest.write( "@RELATION numerals\n\n" );
+            for ( String s : attDeclarations )
+            {
+                writerTrain.write( s );
+                writerTest.write( s );
+            }
 
-				if (lineCount < 100) {
-					writerTrain.write(line + "\n");
-				} else {
-					writerTest.write(line + "\n");
-				}
-				line = reader.readLine();
-				if (lineCount == 200) {
-					lineCount = 0;
-				} else {
-					lineCount++;
-				}
-			}
-			writerTrain.close();
-			writerTest.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println(".arff Writing Done.");
-	}
+            writerTrain.write( "\n\n@DATA \n" );
+            writerTest.write( "\n\n@DATA \n" );
+            BufferedReader reader = new BufferedReader( new InputStreamReader(
+                    ClassLoader.getSystemResourceAsStream( "featuresTabulated" ) ) );
+            String line = reader.readLine();
+            int lineCount = 1;
+            while ( line != null )
+            {
 
-	// Tabulates and combine data files to one file
-	private static void createDataFile() {
-		System.out.println("Creating dataset");
-		for (String s : files) {
+                if ( lineCount < 100 )
+                {
+                    writerTrain.write( line + "\n" );
+                }
+                else
+                {
+                    writerTest.write( line + "\n" );
+                }
+                line = reader.readLine();
+                if ( lineCount == 200 )
+                {
+                    lineCount = 0;
+                }
+                else
+                {
+                    lineCount++;
+                }
+            }
+            writerTrain.close();
+            writerTest.close();
+        }
+        catch ( IOException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println( ".arff Writing Done." );
+    }
 
-			System.out.println("Processing file : " + s);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					ClassLoader.getSystemResourceAsStream("mfeat-digits/" + s)));
-			try {
-				int count = 0;
-				String line = reader.readLine();
-				while (line != null) {
+    // Tabulates and combine data files to one file
+    private static void createDataFile()
+    {
+        System.out.println( "Creating dataset" );
+        for ( String s : files )
+        {
 
-					for (int k = 0; k < 10; k++) {
-						ArrayList<ArrayList<String>> strings = new ArrayList<ArrayList<String>>();
-						for (int i = 0; i < 200; i++) {
+            System.out.println( "Processing file : " + s );
+            BufferedReader reader = new BufferedReader( new InputStreamReader(
+                    ClassLoader.getSystemResourceAsStream( "mfeat-digits/" + s ) ) );
+            try
+            {
+                int count = 0;
+                String line = reader.readLine();
+                while ( line != null )
+                {
 
-							String[] split = line.split(" ");
-							ArrayList<String> features = new ArrayList<String>();
-							for (String str : split) {
-								if (isNumeric(str)) {
-									features.add(str);
-								}
-							}
-							if (attsNumMap.get(s) == null) {
-								attsNumMap.put(s, features.size());
-							}
-							if (features.size() > 0) {
+                    for ( int k = 0; k < 10; k++ )
+                    {
+                        ArrayList<ArrayList<String>> strings = new ArrayList<ArrayList<String>>();
+                        for ( int i = 0; i < 200; i++ )
+                        {
 
-								strings.add(features);
-							}
-							line = reader.readLine();
-							count++;
-						}
-						addToTable(strings, k);
-					}
-				}
-				System.out.println("Total lines processed : " + count);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		// printTable();
-		try {
-			File fileOutput = new File("src/featuresTabulated");
-			FileWriter writer = new FileWriter(fileOutput);
-			int linecount = 0;
-			for (int k = 0; k < 10; k++) {
-				ArrayList<ArrayList<String>> s = table.get(k);
-				for (ArrayList<String> list : s) {
-					numAtts = list.size();
-					String out = "";
-					for (int i = 0; i < list.size(); i++) {
+                            String[] split = line.split( " " );
+                            ArrayList<String> features = new ArrayList<String>();
+                            for ( String str : split )
+                            {
+                                if ( isNumeric( str ) )
+                                {
+                                    features.add( str );
+                                }
+                            }
+                            if ( attsNumMap.get( s ) == null )
+                            {
+                                attsNumMap.put( s, features.size() );
+                            }
+                            if ( features.size() > 0 )
+                            {
 
-						if (i == list.size() - 1) {
-							out += list.get(i) + "," + k;
-						} else {
-							out += list.get(i) + ",";
-						}
-						// if(i == 648){
-						// System.out.println("Linecoutn: "+ linecount +
-						// " String ;" + out);
-						// }
-					}
+                                strings.add( features );
+                            }
+                            line = reader.readLine();
+                            count++;
+                        }
+                        addToTable( strings, k );
+                    }
+                }
+                System.out.println( "Total lines processed : " + count );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        // printTable();
+        try
+        {
+            File fileOutput = new File( "src/featuresTabulated" );
+            FileWriter writer = new FileWriter( fileOutput );
+            int linecount = 0;
+            for ( int k = 0; k < 10; k++ )
+            {
+                ArrayList<ArrayList<String>> s = table.get( k );
+                for ( ArrayList<String> list : s )
+                {
+                    numAtts = list.size();
+                    String out = "";
+                    for ( int i = 0; i < list.size(); i++ )
+                    {
 
-					writer.write(out + "\n");
-					linecount++;
-				}
-			}
-			writer.close();
-			System.out.println("Total lines processed : " + linecount);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("File Collation Done");
-	}
+                        if ( i == list.size() - 1 )
+                        {
+                            out += list.get( i ) + "," + k;
+                        }
+                        else
+                        {
+                            out += list.get( i ) + ",";
+                        }
+                        // if(i == 648){
+                        // System.out.println("Linecoutn: "+ linecount +
+                        // " String ;" + out);
+                        // }
+                    }
 
-	private static HashMap<Integer, ArrayList<ArrayList<String>>> createClassMap() {
+                    writer.write( out + "\n" );
+                    linecount++;
+                }
+            }
+            writer.close();
+            System.out.println( "Total lines processed : " + linecount );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+        System.out.println( "File Collation Done" );
+    }
 
-		HashMap<Integer, ArrayList<ArrayList<String>>> temp = new HashMap<Integer, ArrayList<ArrayList<String>>>();
-		for (int i = 0; i < 10; i++) {
-			temp.put(i, new ArrayList<ArrayList<String>>());
-			for (int j = 0; j < 200; j++) {
-				temp.get(i).add(new ArrayList<String>());
-			}
-		}
-		return temp;
-	}
+    private static HashMap<Integer, ArrayList<ArrayList<String>>> createClassMap()
+    {
 
-	public static boolean isNumeric(String str) {
-		return str.matches("-?\\d+(\\.\\d+)?"); // match a number with optional
-												// '-' and decimal.
-	}
+        HashMap<Integer, ArrayList<ArrayList<String>>> temp = new HashMap<Integer, ArrayList<ArrayList<String>>>();
+        for ( int i = 0; i < 10; i++ )
+        {
+            temp.put( i, new ArrayList<ArrayList<String>>() );
+            for ( int j = 0; j < 200; j++ )
+            {
+                temp.get( i ).add( new ArrayList<String>() );
+            }
+        }
+        return temp;
+    }
 
-	public static void addToTable(ArrayList<ArrayList<String>> values, int k) {
-		for (int i = 0; i < values.size(); i++) {
-			table.get(k).get(i).addAll(values.get(i));
-		}
-	}
+    public static boolean isNumeric( String str )
+    {
+        return str.matches( "-?\\d+(\\.\\d+)?" ); // match a number with optional
+                                                  // '-' and decimal.
+    }
 
-	public static void printTable() {
-		for (ArrayList<ArrayList<String>> s : table.values()) {
-			// System.out.println("Instances list" + s.size());
-			for (ArrayList<String> list : s) {
-				System.out.println("Features list" + list.size());
-			}
-		}
-	}
+    public static void addToTable( ArrayList<ArrayList<String>> values, int k )
+    {
+        for ( int i = 0; i < values.size(); i++ )
+        {
+            table.get( k ).get( i ).addAll( values.get( i ) );
+        }
+    }
+
+    public static void printTable()
+    {
+        for ( ArrayList<ArrayList<String>> s : table.values() )
+        {
+            // System.out.println("Instances list" + s.size());
+            for ( ArrayList<String> list : s )
+            {
+                System.out.println( "Features list" + list.size() );
+            }
+        }
+    }
 }
