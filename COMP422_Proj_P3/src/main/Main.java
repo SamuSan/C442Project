@@ -17,7 +17,7 @@ public class Main
 {
 
     private static String[] files = { "mfeat-fou", "mfeat-fac", "mfeat-kar",
-            "mfeat-pix", "mfeat-zer", "mfeat-mor" };
+            "mfeat-pix", "mfeat-zer", "mfeat-mor"};
     private static HashMap<Integer, ArrayList<ArrayList<String>>> table = createClassMap();
     private static HashMap<String, Integer> attsNumMap = new HashMap<String, Integer>();
     private static ArrayList<String> attDeclarations = new ArrayList<String>();

@@ -35,7 +35,7 @@ public class DecisionTree
             testData = new Instances( new BufferedReader(
                     new InputStreamReader( ClassLoader
                             .getSystemResourceAsStream( test ) ) ) );
-            testData.setClassIndex( trainingData.numAttributes() - 1 );
+            testData.setClassIndex( testData.numAttributes() - 1 );
         }
         catch ( Exception e )
         {
