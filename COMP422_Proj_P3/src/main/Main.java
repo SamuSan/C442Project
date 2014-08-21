@@ -26,12 +26,12 @@ public class Main
     public static void main( String[] args )
     {
 
-         createDataFile();
-         createARFF(files);
+//         createDataFile();
+//         createARFF(files);
          DecisionTree dt = new
          DecisionTree("imageFeaturesTrain.arff","imageFeaturesTest.arff");
          dt.classify();
-        createMorphARFF( "mfeat-digits/mfeat-mor" );
+//        createMorphARFF( "mfeat-digits/mfeat-mor" );
 
         DecisionTree dtMorph = new DecisionTree( "imageFeaturesMorphTrain.arff",
                 "imageFeaturesMorphTest.arff" );

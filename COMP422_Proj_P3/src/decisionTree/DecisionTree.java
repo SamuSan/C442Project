@@ -69,9 +69,9 @@ public class DecisionTree
             for ( int i = 0; i < testData.numInstances(); i++ )
             {
                 double pred = tree.classifyInstance( testData.instance( i ) );
-                System.out.print( "ID: " + testData.instance( i ).value( 0 ) );
-                System.out.print( ", actual: " + testData.classAttribute().value( (int) testData.instance( i ).classValue() ) );
-                System.out.println( ", predicted: " + testData.classAttribute().value( (int) pred ) );
+//                System.out.print( "ID: " + testData.instance( i ).value( 0 ) );
+//                System.out.print( ", actual: " + testData.classAttribute().value( (int) testData.instance( i ).classValue() ) );
+//                System.out.println( ", predicted: " + testData.classAttribute().value( (int) pred ) );
                 if ( testData.classAttribute().value( (int) testData.instance( i ).classValue() ) == testData.classAttribute().value( (int) pred ) )
                 {
                     correct++;
